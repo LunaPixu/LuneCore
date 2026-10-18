@@ -1,0 +1,35 @@
+name: LuneCore
+version: '0.1.0-SNAPSHOT'
+main: net.lunapixu.lunecore.LuneCore
+description: A core plugin for Luna Pixu's plugins
+author: 'Luna Pixu'
+website: 'https://github.com/LunaPixu/LuneCore'
+api-version: '1.21.4'
+loader: net.lunapixu.lunecore.ScalaLoader
+
+dependencies:
+  server:
+    LuckPerms:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    
+permissions:
+  lunecore.reload:
+    description: Allows you to reload the plugin
+    default: op
+
+  lunecore.setprefix:
+    description: Allows you to change your prefix
+    default: op
+  lunecore.setprefix.other:
+    description: Allows you to change other player's prefixes
+    defualt: op
+
+  lunecore.setsuffix:
+    description: Allows you to change your suffix
+    default: op
+  lunecore.setsuffix.other:
+    description: Allows you to change other player's suffixes
+    defualt: op
+  

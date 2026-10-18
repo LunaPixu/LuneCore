@@ -1,0 +1,10 @@
+commands:
+  # LuckPerms commands
+  set-prefix:
+    prefix-template: 
+      # Templates for ranks may be added here in following structure: "<rank>": "template here"
+      # %s indicates where users may insert their prefix text
+      default: "%s "
+  set-suffix:
+    suffix-template:
+      default: "%s"
