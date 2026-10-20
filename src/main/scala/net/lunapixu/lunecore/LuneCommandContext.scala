@@ -38,4 +38,4 @@ class LuneCommandContext(ctx: CommandContext[CommandSourceStack]):
 
   protected def getPlainName(name: Component): String =
     val plainText = PlainTextComponentSerializer.plainText
-    StringUtils.stripTokens(plainText.serialize(name))
+    StringUtils.stripLegacyTokens(plainText.serialize(name))
