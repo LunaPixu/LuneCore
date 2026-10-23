@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.{Entity, Player}
 import net.lunapixu.lunecore.utils.StringUtils
 
-class LuneCommandContext(ctx: CommandContext[CommandSourceStack]):
+class LuneCommandContext(private val ctx: CommandContext[CommandSourceStack]):
   val sender: CommandSender = ctx.getSource.getSender
   val senderAsPlayer: Option[Player] = sender match
     case player: Player => Some(player)

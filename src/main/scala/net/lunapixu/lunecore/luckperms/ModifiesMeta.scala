@@ -95,14 +95,14 @@ abstract class ModifiesMeta(private val metaType: String):
       Placeholder.component(
         "newnode",
         mm.deserialize(
-          StringUtils.legacyToMiniMessage(event.getNewNode.node.getMetaValue.strip),
+          StringUtils.stringToMiniMessage(event.getNewNode.node.getMetaValue.strip),
           TagResolver.standard
         )
       ),
       Placeholder.component(
         "formernode",
         mm.deserialize(
-          StringUtils.legacyToMiniMessage(oldNode.node.fold("") { _.getMetaValue.strip }),
+          StringUtils.stringToMiniMessage(oldNode.node.fold("") { _.getMetaValue.strip }),
           TagResolver.standard
         ).clickEvent(ClickEvent.copyToClipboard(clipboardFormer))
           .hoverEvent(HoverEvent.showText(Component.text(s"Click to copy your ${event
