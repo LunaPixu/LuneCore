@@ -22,12 +22,18 @@ permissions:
   lunecore.setprefix:
     description: Allows you to change your prefix
     default: op
+  lunecore.setprefix.formatting:
+    description: Allows you to apply extra formatting onto your prefix
+    default: op
   lunecore.setprefix.other:
     description: Allows you to change other player's prefixes
     defualt: op
 
   lunecore.setsuffix:
     description: Allows you to change your suffix
+    default: op
+  lunecore.setsuffix.formatting:
+    description: Allows you to apply extra formatting onto your suffix
     default: op
   lunecore.setsuffix.other:
     description: Allows you to change other player's suffixes

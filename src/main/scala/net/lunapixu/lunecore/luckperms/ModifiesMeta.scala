@@ -15,6 +15,7 @@ import net.luckperms.api.node.types.SuffixNode.Builder as SuffixBuilder
 import net.luckperms.api.node.Node
 import net.lunapixu.lunecore.luckperms.{MetaHelper, MetaModifiedEvent}
 import net.lunapixu.lunecore.utils.StringUtils
+import net.lunapixu.lunecore.LuneCommandContext
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 import scala.jdk.CollectionConverters.*
@@ -27,6 +28,18 @@ abstract class ModifiesMeta(private val metaType: String):
   def getMetaType = metaType
 
   protected val timeoutSecs = 20
+
+  protected def guardFromFormatting(
+    string: String,
+    metaType: String,
+    context: LuneCommandContext
+  ): String = context.sender.hasPermission(s"lunecore.set${metaType}.formatting") match
+    case true  => string
+    case false => MiniMessage.miniMessage.escapeTags(
+        StringUtils.escapeChattyFormat(string),
+        oldNodeResolver(None, ""),
+        newNodeResolver(None)
+      )
 
   protected def updateUserMeta(
     userFuture: CompletableFuture[User],
@@ -46,7 +59,7 @@ abstract class ModifiesMeta(private val metaType: String):
       val highestWeight = metaNodes.entrySet.asScala.map { entry => (entry.getValue, entry.getKey) }
         .foldLeft(1) { (acc, p: MetaHelper.Tuple) => acc max p.weight }
 
-      val metaPath = s"${getMetaType}-template"
+      val metaPath = s"${metaType}-template"
       val rank = userMetadata.getPrimaryGroup
       val metaTemplate = Option(config.getString(s"${configPath}.${metaPath}.${rank}"))
         .getOrElse(config.getString(s"${configPath}.${metaPath}.default", defaultMeta))
@@ -81,6 +94,25 @@ abstract class ModifiesMeta(private val metaType: String):
       )
     }
 
+  private def newNodeResolver(node: Option[MetaHelper.Node]) = Placeholder.component(
+    "newnode",
+    MiniMessage.miniMessage.deserialize(
+      StringUtils.stringToMiniMessage(node.fold("") { _.getMetaValue.strip }),
+      TagResolver.standard
+    )
+  )
+
+  private def oldNodeResolver(node: Option[MetaHelper.Node], clipboardFormer: String) = Placeholder
+    .component(
+      "formernode",
+      MiniMessage.miniMessage.deserialize(
+        StringUtils.stringToMiniMessage(node.fold("") { _.getMetaValue.strip }),
+        TagResolver.standard
+      ).clickEvent(ClickEvent.copyToClipboard(clipboardFormer)).hoverEvent(HoverEvent.showText(
+        Component.text(s"Click to copy your ${metaType} to clipboard.")
+      ))
+    )
+
   protected def makeUpdatedMetaComponent(event: MetaModifiedEvent): Component =
     val plainText = PlainTextComponentSerializer.plainText
     val mm = MiniMessage.miniMessage
@@ -89,23 +121,11 @@ abstract class ModifiesMeta(private val metaType: String):
       s"\n  <grey><i>Was (</i></grey><formernode><grey><i>)."
     }
     // If this is a user's first time updating their meta, try to recover the old node text from raw data since cache will be non-existent
-    val clipboardFormer = oldNode.rawString.getOrElse(oldNode.node.fold("") { _.getMetaValue.strip })
+    val clipboardFormer = oldNode.rawString.fold(oldNode.node.fold("") { n =>
+      s"\"${n.getMetaValue.strip}\""
+    }) { str => s"\"${str}\"" }
     event.getUserAsPlayer.displayName.append(mm.deserialize(
-      s" <gold>has had their ${getMetaType} updated to (</gold><newnode><gold>)!${formerly}",
-      Placeholder.component(
-        "newnode",
-        mm.deserialize(
-          StringUtils.stringToMiniMessage(event.getNewNode.node.getMetaValue.strip),
-          TagResolver.standard
-        )
-      ),
-      Placeholder.component(
-        "formernode",
-        mm.deserialize(
-          StringUtils.stringToMiniMessage(oldNode.node.fold("") { _.getMetaValue.strip }),
-          TagResolver.standard
-        ).clickEvent(ClickEvent.copyToClipboard(clipboardFormer))
-          .hoverEvent(HoverEvent.showText(Component.text(s"Click to copy your ${event
-              .getMetaType} to clipboard.")))
-      )
+      s" <gold>has had their ${metaType} updated to (</gold><newnode><gold>)!${formerly}",
+      newNodeResolver(Some(event.getNewNode.node)),
+      oldNodeResolver(event.getOldNode.node, clipboardFormer)
     ))

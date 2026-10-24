@@ -41,6 +41,7 @@ class SuffixCommand(plugin: LuneCore) extends ModifiesMeta("suffix"):
         targetPlayer <- target.fold(context.executorAsPlayer) { p => Some(p) }.filter { _.isOnline }
           .toRight("Target is not an online player.")
         suffixStr <- Option(ctx.getArgument(getMetaType, classOf[String])).filter { _.length > 0 }
+          .map { s => guardFromFormatting(s, getMetaType, context) }
           .toRight(s"${getMetaType.capitalize} cannot be empty.")
       yield
         given userManager: UserManager = LuckPermsProvider.get.getUserManager
