@@ -1,5 +1,5 @@
 name: LuneCore
-version: '0.2.0-SNAPSHOT'
+version: '0.2.0'
 main: net.lunapixu.lunecore.LuneCore
 description: A core plugin for Luna Pixu's plugins
 author: 'Luna Pixu'

@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "Lune Core",
     organization := "net.lunapixu",
-    version := "0.2.0-SNAPSHOT",
+    version := "0.2.0",
     artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
       artifact.name + '-' + module.revision + '.' + artifact.extension
     }
